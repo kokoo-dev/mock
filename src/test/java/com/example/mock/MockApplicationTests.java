@@ -50,26 +50,50 @@ class MockApplicationTests {
 
 	@Test
 	public void testCallBasic() throws Exception {
+		String url = "/mock/callBasic";
 
 		//call get
-		mockMvc.perform(MockMvcRequestBuilders.get("/mock/callBasic")
+		mockMvc.perform(MockMvcRequestBuilders.get(url)
 				.accept(MediaType.TEXT_HTML))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 
 		//call post
-		mockMvc.perform(MockMvcRequestBuilders.post("/mock/callBasic")
+		mockMvc.perform(MockMvcRequestBuilders.post(url)
 				.accept(MediaType.TEXT_HTML))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
 	@Test
+	public void testCallCheckReturnStr() throws Exception {
+		String param = "TestParam";
+		String url = "/mock/callCheckReturnStr";
+
+		mockMvc.perform(MockMvcRequestBuilders.get(url)
+				.accept(MediaType.TEXT_HTML)
+				.param("data", param))
+				.andExpect(MockMvcResultMatchers.content().string(param.concat("_return")))
+				.andDo(MockMvcResultHandlers.print());
+	}
+
+	@Test
+	public void testCallCheckReturnModel() throws Exception {
+		String url = "/mock/callCheckReturnModel";
+
+		mockMvc.perform(MockMvcRequestBuilders.get(url)
+				.accept(MediaType.TEXT_HTML))
+				.andExpect(MockMvcResultMatchers.model().attribute("key", "value"))
+				.andDo(MockMvcResultHandlers.print());
+	}
+
+	@Test
 	public void testCallWithParam() throws Exception {
+		String url = "/mock/callWithParam";
 		MultiValueMap<String, String> mv = new LinkedMultiValueMap<>();
 		mv.add("data", "String Data");
 		mv.add("arrayData", "Array Data1");
 		mv.add("arrayData", "Array Data2");
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/mock/callWithParam")
+		mockMvc.perform(MockMvcRequestBuilders.get(url)
 				.accept(MediaType.TEXT_HTML)
 				.params(mv))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -78,8 +102,10 @@ class MockApplicationTests {
 
 	@Test
 	public void testCallWithOneFile() throws Exception{
+		String url = "/mock/callWithOneFile";
 		MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "test.txt", "text/plain", "Mock Test Text File".getBytes());
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/mock/callWithOneFile")
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart(url)
 				.file(mockMultipartFile))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print());
@@ -87,13 +113,14 @@ class MockApplicationTests {
 
 	@Test
 	public void testCallWithMultiFile() throws Exception{
+		String url = "/mock/callWithMultiFile";
 		List<MockMultipartFile> mockMultipartFileList = new ArrayList<>();
 
 		for(int i=0; i<5; i++){
 			mockMultipartFileList.add(new MockMultipartFile("file", "test_" + i + ".txt", "text/plain", "Mock Test Text File".getBytes()));
 		}
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/mock/callWithMultiFile")
+		mockMvc.perform(MockMvcRequestBuilders.multipart(url)
 				.file(mockMultipartFileList.get(0))
 				.file(mockMultipartFileList.get(1))
 				.file(mockMultipartFileList.get(2))
@@ -101,6 +128,5 @@ class MockApplicationTests {
 				.file(mockMultipartFileList.get(4)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print());
-
 	}
 }
